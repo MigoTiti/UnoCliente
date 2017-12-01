@@ -27,7 +27,7 @@ public class UnoCliente extends JApplet {
             } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
             }
             
-            JFrame frame = new JFrame("JavaFX 2 in Swing");
+            JFrame frame = new JFrame("Uno");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             
             JApplet applet = new UnoCliente();
