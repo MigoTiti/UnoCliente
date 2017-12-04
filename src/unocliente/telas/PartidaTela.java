@@ -31,7 +31,10 @@ public class PartidaTela {
     private int vezDoJogador = 1;
     private boolean correnteCompra = false;
     private int correnteCompraQuantidade = 0;
-    
+    private boolean sentidoHorario = true;
+    private boolean jaComprou = false;
+    private boolean euComprei = false;
+
     private Carta cartaNaMesa;
 
     private List<Carta> maoDoJogador;
@@ -42,6 +45,7 @@ public class PartidaTela {
 
     private final Button jogar = new Button("Jogar");
     private final Label vezJogador = new Label();
+    private final Label contagemCorrenteLabel = new Label("Contagem corrente: 0");
     private final ListView<Carta> listaCartas = new ListView<>();
     private final StackPane cartaPreview = new StackPane();
 
@@ -71,9 +75,12 @@ public class PartidaTela {
         jogar.setOnAction(value -> {
             if (nJogador == vezDoJogador) {
                 Carta cartaJogada = listaCartas.getSelectionModel().getSelectedItem();
-                
+
                 if (validarJogada(cartaJogada)) {
-                    
+                    this.comunicador.enviarMensagem(Comunicador.JOGAR_CARTA + "&" + cartaJogada.toString());
+                    listaCartas.getItems().remove(listaCartas.getSelectionModel().getSelectedIndex());
+                    Rectangle stub = new Rectangle(CartaVisual.LARGURA_CARTA, CartaVisual.ALTURA_CARTA, Color.WHITE);
+                    cartaPreview.getChildren().add(stub);
                 } else {
                     UnoCliente.enviarMensagemErro("Jogada inválida");
                 }
@@ -85,7 +92,16 @@ public class PartidaTela {
         Button comprarCarta = new Button("Comprar");
         comprarCarta.setOnAction(value -> {
             if (nJogador == vezDoJogador) {
-                
+                if (!jaComprou) {
+                    comprarCarta.setText("Pular");
+                    jaComprou = true;
+                    this.comunicador.enviarMensagem(Integer.toString(Comunicador.COMPRAR_CARTA));
+                    euComprei = true;
+                } else {
+                    comprarCarta.setText("Comprar");
+                    jaComprou = false;
+                    this.comunicador.enviarMensagem(Integer.toString(Comunicador.PULAR_JOGADA));
+                }
             } else {
                 UnoCliente.enviarMensagemErro("Espere a sua vez");
             }
@@ -100,10 +116,10 @@ public class PartidaTela {
         Rectangle stub = new Rectangle(CartaVisual.LARGURA_CARTA, CartaVisual.ALTURA_CARTA, Color.WHITE);
         cartaPreview.getChildren().add(stub);
 
-        VBox vboxTop = new VBox(vezJogador);
+        VBox vboxTop = new VBox(vezJogador, contagemCorrenteLabel);
         vboxTop.setPadding(new Insets(10));
         vboxTop.setAlignment(Pos.CENTER);
-        
+
         root.setRight(vboxTop);
         root.setLeft(vboxMao);
         root.setBottom(hbox);
@@ -115,21 +131,77 @@ public class PartidaTela {
 
     private boolean validarJogada(Carta cartaEscolhida) {
         int corCartaEscolhida = cartaEscolhida.getCor();
-	int numeroCartaEscolhida = cartaEscolhida.getNumero();
-	int corCartaNaMesa = cartaNaMesa.getCor();
-	int numeroCartaNaMesa = cartaNaMesa.getNumero();
+        int numeroCartaEscolhida = cartaEscolhida.getNumero();
+        int corCartaNaMesa = cartaNaMesa.getCor();
+        int numeroCartaNaMesa = cartaNaMesa.getNumero();
 
-	if ((numeroCartaNaMesa == Carta.MAIS_DOIS || numeroCartaNaMesa == Carta.MAIS_QUATRO) && correnteCompra)
-	{
+        if ((numeroCartaNaMesa == Carta.MAIS_DOIS || numeroCartaNaMesa == Carta.MAIS_QUATRO) && correnteCompra) {
             return numeroCartaEscolhida == Carta.MAIS_DOIS || numeroCartaEscolhida == Carta.MAIS_QUATRO;
-	}
+        }
 
-	if (numeroCartaEscolhida == Carta.MAIS_QUATRO || numeroCartaEscolhida == Carta.CORINGA)
+        if (numeroCartaEscolhida == Carta.MAIS_QUATRO || numeroCartaEscolhida == Carta.CORINGA) {
             return true;
+        }
 
-	return corCartaEscolhida == corCartaNaMesa || numeroCartaEscolhida == numeroCartaNaMesa;
+        return corCartaEscolhida == corCartaNaMesa || numeroCartaEscolhida == numeroCartaNaMesa;
     }
-    
+
+    private void handleMensagens() {
+        while (true) {
+            String mensagemServidor = comunicador.receberMensagem();
+            StringTokenizer st = new StringTokenizer(mensagemServidor, "&");
+
+            int comando = Integer.parseInt(st.nextToken());
+
+            switch (comando) {
+                case Comunicador.RESPOSTA_COMPRA:
+                    int quantidade = Integer.parseInt(st.nextToken());
+
+                    if (quantidade > 1) {
+                        correnteCompra = false;
+                        setCorrenteCompraQuantidade(0);
+                    }
+
+                    if (euComprei) {
+                        euComprei = false;
+                        if (quantidade == 1) {
+                            Platform.runLater(() -> {
+                                Carta carta = Utilitarios.decodificarCarta(st.nextToken());
+                                maoDoJogador.add(carta);
+                                listaCartas.getItems().add(carta);
+                            });
+                        } else {
+                            Platform.runLater(() -> {
+                                List<Carta> cartas = Utilitarios.decodificarCartas(st);
+
+                                cartas.stream().forEach((carta) -> {
+                                    maoDoJogador.add(carta);
+                                    listaCartas.getItems().add(carta);
+                                });
+                            });
+                        }
+                    }
+
+                    break;
+                case Comunicador.REPORTAR_JOGADA:
+                    //CARTA NA MESA + SENTIDO HORÁRIO + PROXIMO JOGADOR + CORRENTE COMPRA + CONTAGEM CORRENTE
+                    setCartaNaMesa(Utilitarios.decodificarCarta(st.nextToken()));
+                    sentidoHorario = st.nextToken().equals("1");
+                    setVezDoJogador(Integer.parseInt(st.nextToken()));
+                    correnteCompra = st.nextToken().equals("1");
+
+                    if (correnteCompra) {
+                        setCorrenteCompraQuantidade(Integer.parseInt(st.nextToken()));
+                    }
+
+                    break;
+                case Comunicador.PULAR_JOGADA:
+                    setVezDoJogador(Integer.parseInt(st.nextToken()));
+                    break;
+            }
+        }
+    }
+
     private void iniciarJogo() {
         String mensagemInicial = comunicador.receberMensagem();
         StringTokenizer st = new StringTokenizer(mensagemInicial, "&");
@@ -145,7 +217,7 @@ public class PartidaTela {
 
             Platform.runLater(() -> {
                 CartaVisual c = new CartaVisual(cartaNaMesa.getCor(), cartaNaMesa.getNumero());
-                cartaNaMesaPane.getChildren().add(new StackPane(c, c.getNumero()));
+                cartaNaMesaPane.getChildren().addAll(c, c.getNumero());
 
                 if (nJogador == 1) {
                     vezJogador.setText("Sua vez");
@@ -163,7 +235,7 @@ public class PartidaTela {
 
                 listaCartas.setItems(cartas);
                 listaCartas.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends Carta> observable, Carta oldValue, Carta newValue) -> {
-                    jogar.setDisable(false);
+                    jogar.setDisable(nJogador != vezDoJogador);
                     CartaVisual cTemp = new CartaVisual(newValue.getCor(), newValue.getNumero());
                     cartaPreview.getChildren().clear();
                     cartaPreview.getChildren().addAll(cTemp, cTemp.getNumero());
@@ -171,7 +243,41 @@ public class PartidaTela {
             });
 
             printInformacoes();
+            handleMensagens();
         }
+    }
+
+    private void setCorrenteCompraQuantidade(int contagem) {
+        correnteCompraQuantidade = contagem;
+
+        Platform.runLater(() -> {
+            contagemCorrenteLabel.setText("Contagem corrente: " + correnteCompraQuantidade);
+        });
+    }
+
+    private void setVezDoJogador(int jogador) {
+        vezDoJogador = jogador;
+
+        Platform.runLater(() -> {
+            if (vezDoJogador == nJogador) {
+                vezJogador.setText("Sua vez");
+                vezJogador.setTextFill(Color.GREEN);
+            } else {
+                vezJogador.setText("Vez do jogador " + vezDoJogador);
+                vezJogador.setTextFill(Color.RED);
+            }
+        });
+    }
+
+    private void setCartaNaMesa(Carta c) {
+        cartaNaMesa = c;
+
+        CartaVisual cTemp = new CartaVisual(cartaNaMesa.getCor(), cartaNaMesa.getNumero());
+
+        Platform.runLater(() -> {
+            cartaNaMesaPane.getChildren().clear();
+            cartaNaMesaPane.getChildren().addAll(cTemp, cTemp.getNumero());
+        });
     }
 
     private void printInformacoes() {

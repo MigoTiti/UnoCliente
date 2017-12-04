@@ -8,7 +8,7 @@ import javafx.application.Platform;
 import unocliente.UnoCliente;
 
 public class Comunicador {
-    
+
     public static final int SOLICITAR_CONEXAO = 1;
     public static final int CONFIRMAR_CONEXAO = 2;
     public static final int CRIAR_PARTIDA = 3;
@@ -21,10 +21,13 @@ public class Comunicador {
     public static final int DISTRIBUIR_CARTAS = 10;
     public static final int JOGAR_CARTA = 11;
     public static final int COMPRAR_CARTA = 12;
-    
+    public static final int PULAR_JOGADA = 13;
+    public static final int RESPOSTA_COMPRA = 14;
+    public static final int REPORTAR_JOGADA = 15;
+
     private InetAddress ipAEnviar;
     private int portaAEnviar;
-    
+
     private DatagramSocket socket;
 
     public Comunicador(DatagramSocket socket, InetAddress ipAEnviar) {
@@ -45,16 +48,16 @@ public class Comunicador {
             });
         }
     }
-    
+
     public String receberMensagem() {
         try {
             byte[] buffer = new byte[500];
             DatagramPacket pacoteResposta = new DatagramPacket(buffer, buffer.length);
             socket.receive(pacoteResposta);
-            
+
             ipAEnviar = pacoteResposta.getAddress();
             portaAEnviar = pacoteResposta.getPort();
-            
+
             String respostaString = new String(pacoteResposta.getData());
 
             return respostaString;
@@ -66,7 +69,7 @@ public class Comunicador {
 
         return null;
     }
-    
+
     public DatagramSocket getSocket() {
         return socket;
     }

@@ -95,7 +95,6 @@ public class EscolherPartidaTela {
             
             if (partidaSelecionada != null) {
                 comunicador.enviarMensagem(Comunicador.ENTRAR_EM_PARTIDA + "&" + partidaSelecionada.getId());
-                UnoCliente.enviarMensagemInfo("Tentando conexão");
                 
                 String resposta = comunicador.receberMensagem();
                 StringTokenizer st = new StringTokenizer(resposta, "&");
