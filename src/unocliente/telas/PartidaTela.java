@@ -1,6 +1,7 @@
 package unocliente.telas;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.StringTokenizer;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
@@ -10,9 +11,13 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -21,6 +26,7 @@ import javafx.scene.shape.Rectangle;
 import unocliente.UnoCliente;
 import unocliente.estruturas.Carta;
 import unocliente.estruturas.CartaVisual;
+import unocliente.rede.Comunicador;
 import unocliente.rede.Comunicador;
 import unocliente.util.Utilitarios;
 
@@ -43,6 +49,8 @@ public class PartidaTela {
 
     private StackPane cartaNaMesaPane;
 
+    private int corSelecionadaTemp = -1;
+    
     private final Button jogar = new Button("Jogar");
     private final Label vezJogador = new Label();
     private final Label contagemCorrenteLabel = new Label("Contagem corrente: 0");
@@ -77,10 +85,103 @@ public class PartidaTela {
                 Carta cartaJogada = listaCartas.getSelectionModel().getSelectedItem();
 
                 if (validarJogada(cartaJogada)) {
-                    this.comunicador.enviarMensagem(Comunicador.JOGAR_CARTA + "&" + cartaJogada.toString());
-                    listaCartas.getItems().remove(listaCartas.getSelectionModel().getSelectedIndex());
-                    Rectangle stub = new Rectangle(CartaVisual.LARGURA_CARTA, CartaVisual.ALTURA_CARTA, Color.WHITE);
-                    cartaPreview.getChildren().add(stub);
+                    if (cartaJogada.getCor() == Carta.COR_PRETA && cartaJogada.getNumero() == Carta.CORINGA) {
+                        Dialog<Integer> dialog = new Dialog<>();
+                        dialog.setTitle("Escolha a cor desejada");
+                        dialog.setResizable(true);
+
+                        int tamanho = 200;
+                        
+                        Color vermelhoInicial = Color.rgb(96, 0, 0);
+                        Color azulInicial = Color.rgb(0, 0, 96);
+                        Color amareloInicial = Color.rgb(215, 215, 0);
+                        Color verdeInicial = Color.rgb(0, 96, 0);
+                        
+                        Color vermelhoSelecionado = Color.RED;
+                        Color azulSelecionado = Color.BLUE;
+                        Color amareloSelecionado = Color.YELLOW;
+                        Color verdeSelecionado = Color.GREEN;
+                        
+                        Rectangle vermelho = new Rectangle(tamanho, tamanho, vermelhoInicial);
+                        Rectangle azul = new Rectangle(tamanho, tamanho, azulInicial);
+                        Rectangle amarelo = new Rectangle(tamanho, tamanho, amareloInicial);
+                        Rectangle verde = new Rectangle(tamanho, tamanho, verdeInicial);
+
+                        GridPane grid = new GridPane();
+                        grid.add(vermelho, 1, 1);
+                        grid.add(azul, 2, 1);
+                        grid.add(amarelo, 1, 2);
+                        grid.add(verde, 2, 2);
+                        dialog.getDialogPane().setContent(grid);
+
+                        ButtonType buttonTypeOk = new ButtonType("Escolher", ButtonBar.ButtonData.OK_DONE);
+                        dialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
+                        
+                        final Button okButton = (Button) dialog.getDialogPane().lookupButton(buttonTypeOk);
+                        okButton.setDisable(true);
+                        
+                        vermelho.setOnMouseClicked(event -> {
+                            vermelho.setFill(vermelhoSelecionado);
+                            azul.setFill(azulInicial);
+                            verde.setFill(verdeInicial);
+                            amarelo.setFill(amareloInicial);
+                            corSelecionadaTemp = Carta.COR_VERMELHA;
+                            okButton.setDisable(false);
+                        });
+                        
+                        azul.setOnMouseClicked(event -> {
+                            azul.setFill(azulSelecionado);
+                            vermelho.setFill(vermelhoInicial);
+                            verde.setFill(verdeInicial);
+                            amarelo.setFill(amareloInicial);
+                            corSelecionadaTemp = Carta.COR_AZUL;
+                            okButton.setDisable(false);
+                        });
+                        
+                        amarelo.setOnMouseClicked(event -> {
+                            amarelo.setFill(amareloSelecionado);
+                            vermelho.setFill(vermelhoInicial);
+                            azul.setFill(azulInicial);
+                            verde.setFill(verdeInicial);
+                            corSelecionadaTemp = Carta.COR_AMARELA;
+                            okButton.setDisable(false);
+                        });
+                        
+                        verde.setOnMouseClicked(event -> {
+                            verde.setFill(verdeSelecionado);
+                            vermelho.setFill(vermelhoInicial);
+                            azul.setFill(azulInicial);
+                            amarelo.setFill(amareloInicial);
+                            corSelecionadaTemp = Carta.COR_VERDE;
+                            okButton.setDisable(false);
+                        });
+
+                        dialog.setResultConverter((ButtonType b) -> {
+                            if (b == buttonTypeOk) {
+                                return corSelecionadaTemp;
+                            }
+                            
+                            corSelecionadaTemp = -1;
+                            return null;
+                        });
+
+                        Optional<Integer> result = dialog.showAndWait();
+
+                        if (result.isPresent()) {
+                            Integer novaCor = result.get();
+                            cartaJogada.setCor(novaCor);
+                            
+                            this.comunicador.enviarMensagem(Comunicador.JOGAR_CARTA + "&" + cartaJogada.toString());
+                            listaCartas.getItems().remove(listaCartas.getSelectionModel().getSelectedIndex());
+                            Rectangle stub = new Rectangle(CartaVisual.LARGURA_CARTA, CartaVisual.ALTURA_CARTA, Color.WHITE);
+                            cartaPreview.getChildren().add(stub);
+                        }
+                    } else {
+                        this.comunicador.enviarMensagem(Comunicador.JOGAR_CARTA + "&" + cartaJogada.toString());
+                        listaCartas.getItems().remove(listaCartas.getSelectionModel().getSelectedIndex());
+                        Rectangle stub = new Rectangle(CartaVisual.LARGURA_CARTA, CartaVisual.ALTURA_CARTA, Color.WHITE);
+                        cartaPreview.getChildren().add(stub);
+                    }
                 } else {
                     UnoCliente.enviarMensagemErro("Jogada inválida");
                 }

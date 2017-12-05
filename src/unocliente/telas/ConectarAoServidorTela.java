@@ -1,11 +1,11 @@
 package unocliente.telas;
 
-import java.net.DatagramSocket;
+import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.StringTokenizer;
-import unocliente.UnoCliente;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -18,6 +18,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import unocliente.UnoCliente;
+import unocliente.rede.Comunicador;
 import unocliente.rede.Comunicador;
 
 public class ConectarAoServidorTela {
@@ -50,7 +52,7 @@ public class ConectarAoServidorTela {
     
     private void conectarAoServidor(String ip) {
         try {
-            Comunicador comunicador = new Comunicador(new DatagramSocket(), InetAddress.getByName(ip));
+            Comunicador comunicador = new Comunicador(new Socket(InetAddress.getByName(ip), UnoCliente.PORTA_SERVIDOR));
             comunicador.enviarMensagem(Integer.toString(Comunicador.SOLICITAR_CONEXAO));
             String confirmacao = comunicador.receberMensagem();
             
@@ -62,6 +64,8 @@ public class ConectarAoServidorTela {
                 new EscolhaTela().iniciarTela(comunicador);
             }
         } catch (SocketException | UnknownHostException ex) {
+            UnoCliente.exibirException(ex);
+        } catch (IOException ex) {
             UnoCliente.exibirException(ex);
         }
     }

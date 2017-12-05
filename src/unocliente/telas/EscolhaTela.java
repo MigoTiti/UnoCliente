@@ -19,6 +19,7 @@ import javafx.scene.layout.VBox;
 import unocliente.UnoCliente;
 import unocliente.rede.Comunicador;
 import unocliente.estruturas.Partida;
+import unocliente.rede.Comunicador;
 import unocliente.util.Utilitarios;
 
 public class EscolhaTela {

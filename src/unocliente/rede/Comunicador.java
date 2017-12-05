@@ -1,8 +1,15 @@
 package unocliente.rede;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 
 import unocliente.UnoCliente;
@@ -25,23 +32,23 @@ public class Comunicador {
     public static final int RESPOSTA_COMPRA = 14;
     public static final int REPORTAR_JOGADA = 15;
 
-    private InetAddress ipAEnviar;
-    private int portaAEnviar;
+    private Socket socket;
+    private BufferedReader inputStream;
+    private PrintWriter writer;
 
-    private DatagramSocket socket;
-
-    public Comunicador(DatagramSocket socket, InetAddress ipAEnviar) {
-        this.socket = socket;
-        this.ipAEnviar = ipAEnviar;
-        this.portaAEnviar = UnoCliente.PORTA_SERVIDOR;
+    public Comunicador(Socket socket) {
+        try {
+            this.socket = socket;
+            this.inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            this.writer = new PrintWriter(socket.getOutputStream(), true);
+        } catch (IOException ex) {
+            UnoCliente.exibirException(ex);
+        }
     }
 
     public void enviarMensagem(String mensagemString) {
         try {
-            mensagemString = mensagemString + "&";
-            byte[] mensagem = mensagemString.getBytes();
-            DatagramPacket pacoteAEnviar = new DatagramPacket(mensagem, mensagem.length, ipAEnviar, portaAEnviar);
-            socket.send(pacoteAEnviar);
+            writer.println(mensagemString + "&");
         } catch (Exception ex) {
             Platform.runLater(() -> {
                 UnoCliente.exibirException(ex);
@@ -51,16 +58,7 @@ public class Comunicador {
 
     public String receberMensagem() {
         try {
-            byte[] buffer = new byte[500];
-            DatagramPacket pacoteResposta = new DatagramPacket(buffer, buffer.length);
-            socket.receive(pacoteResposta);
-
-            ipAEnviar = pacoteResposta.getAddress();
-            portaAEnviar = pacoteResposta.getPort();
-
-            String respostaString = new String(pacoteResposta.getData());
-
-            return respostaString;
+            return inputStream.readLine();
         } catch (Exception ex) {
             Platform.runLater(() -> {
                 UnoCliente.exibirException(ex);
@@ -70,11 +68,11 @@ public class Comunicador {
         return null;
     }
 
-    public DatagramSocket getSocket() {
+    public Socket getSocket() {
         return socket;
     }
 
-    public void setSocket(DatagramSocket socket) {
+    public void setSocket(Socket socket) {
         this.socket = socket;
     }
 }

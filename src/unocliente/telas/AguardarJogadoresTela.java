@@ -17,11 +17,7 @@ import unocliente.rede.Comunicador;
 
 public class AguardarJogadoresTela {
     
-    private Comunicador comunicador;
-    
     public void iniciarTela(Comunicador comunicador) {
-        this.comunicador = comunicador;
-        
         Text texto = new Text("Aguardando jogadores");
         texto.setFont(Font.font("Arial", FontWeight.NORMAL, 20));
 
