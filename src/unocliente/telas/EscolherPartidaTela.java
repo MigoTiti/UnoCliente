@@ -18,7 +18,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import unocliente.UnoCliente;
-import unocliente.rede.Comunicador;
 import unocliente.estruturas.Partida;
 import unocliente.estruturas.PartidaLista;
 import unocliente.rede.Comunicador;

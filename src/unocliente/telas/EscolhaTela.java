@@ -17,7 +17,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import unocliente.UnoCliente;
-import unocliente.rede.Comunicador;
 import unocliente.estruturas.Partida;
 import unocliente.rede.Comunicador;
 import unocliente.util.Utilitarios;

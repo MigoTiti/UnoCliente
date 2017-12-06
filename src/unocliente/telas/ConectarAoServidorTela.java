@@ -20,7 +20,6 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import unocliente.UnoCliente;
 import unocliente.rede.Comunicador;
-import unocliente.rede.Comunicador;
 
 public class ConectarAoServidorTela {
     

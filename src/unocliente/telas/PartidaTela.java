@@ -27,7 +27,6 @@ import unocliente.UnoCliente;
 import unocliente.estruturas.Carta;
 import unocliente.estruturas.CartaVisual;
 import unocliente.rede.Comunicador;
-import unocliente.rede.Comunicador;
 import unocliente.util.Utilitarios;
 
 public class PartidaTela {
