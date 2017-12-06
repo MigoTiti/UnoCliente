@@ -24,6 +24,8 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import unocliente.estruturas.Carta;
+import unocliente.estruturas.CartaVisual;
 import unocliente.telas.ConectarAoServidorTela;
 
 public class UnoCliente extends JApplet {
@@ -76,7 +78,9 @@ public class UnoCliente extends JApplet {
             new ConectarAoServidorTela().iniciarTela(ipCampo.getText());
         });
 
-        VBox vBox = new VBox(ipCampo, btn);
+        StackPane testeCarta = CartaVisual.gerarCartaVisual(Carta.COR_AMARELA, 3);
+        
+        VBox vBox = new VBox(ipCampo, btn, testeCarta);
         vBox.setAlignment(Pos.CENTER);
         vBox.setSpacing(10);
         vBox.setPadding(new Insets(10));

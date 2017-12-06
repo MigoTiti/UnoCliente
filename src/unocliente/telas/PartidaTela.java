@@ -49,7 +49,7 @@ public class PartidaTela {
     private StackPane cartaNaMesaPane;
 
     private int corSelecionadaTemp = -1;
-    
+
     private final Button jogar = new Button("Jogar");
     private final Label vezJogador = new Label();
     private final Label contagemCorrenteLabel = new Label("Contagem corrente: 0");
@@ -90,17 +90,17 @@ public class PartidaTela {
                         dialog.setResizable(true);
 
                         int tamanho = 200;
-                        
+
                         Color vermelhoInicial = Color.rgb(96, 0, 0);
                         Color azulInicial = Color.rgb(0, 0, 96);
                         Color amareloInicial = Color.rgb(215, 215, 0);
                         Color verdeInicial = Color.rgb(0, 96, 0);
-                        
+
                         Color vermelhoSelecionado = Color.RED;
                         Color azulSelecionado = Color.BLUE;
                         Color amareloSelecionado = Color.YELLOW;
                         Color verdeSelecionado = Color.GREEN;
-                        
+
                         Rectangle vermelho = new Rectangle(tamanho, tamanho, vermelhoInicial);
                         Rectangle azul = new Rectangle(tamanho, tamanho, azulInicial);
                         Rectangle amarelo = new Rectangle(tamanho, tamanho, amareloInicial);
@@ -115,10 +115,10 @@ public class PartidaTela {
 
                         ButtonType buttonTypeOk = new ButtonType("Escolher", ButtonBar.ButtonData.OK_DONE);
                         dialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
-                        
+
                         final Button okButton = (Button) dialog.getDialogPane().lookupButton(buttonTypeOk);
                         okButton.setDisable(true);
-                        
+
                         vermelho.setOnMouseClicked(event -> {
                             vermelho.setFill(vermelhoSelecionado);
                             azul.setFill(azulInicial);
@@ -127,7 +127,7 @@ public class PartidaTela {
                             corSelecionadaTemp = Carta.COR_VERMELHA;
                             okButton.setDisable(false);
                         });
-                        
+
                         azul.setOnMouseClicked(event -> {
                             azul.setFill(azulSelecionado);
                             vermelho.setFill(vermelhoInicial);
@@ -136,7 +136,7 @@ public class PartidaTela {
                             corSelecionadaTemp = Carta.COR_AZUL;
                             okButton.setDisable(false);
                         });
-                        
+
                         amarelo.setOnMouseClicked(event -> {
                             amarelo.setFill(amareloSelecionado);
                             vermelho.setFill(vermelhoInicial);
@@ -145,7 +145,7 @@ public class PartidaTela {
                             corSelecionadaTemp = Carta.COR_AMARELA;
                             okButton.setDisable(false);
                         });
-                        
+
                         verde.setOnMouseClicked(event -> {
                             verde.setFill(verdeSelecionado);
                             vermelho.setFill(vermelhoInicial);
@@ -159,7 +159,7 @@ public class PartidaTela {
                             if (b == buttonTypeOk) {
                                 return corSelecionadaTemp;
                             }
-                            
+
                             corSelecionadaTemp = -1;
                             return null;
                         });
@@ -169,17 +169,15 @@ public class PartidaTela {
                         if (result.isPresent()) {
                             Integer novaCor = result.get();
                             cartaJogada.setCor(novaCor);
-                            
+
                             this.comunicador.enviarMensagem(Comunicador.JOGAR_CARTA + "&" + cartaJogada.toString());
                             listaCartas.getItems().remove(listaCartas.getSelectionModel().getSelectedIndex());
-                            Rectangle stub = new Rectangle(CartaVisual.LARGURA_CARTA, CartaVisual.ALTURA_CARTA, Color.WHITE);
-                            cartaPreview.getChildren().add(stub);
+                            setPreview(null);
                         }
                     } else {
                         this.comunicador.enviarMensagem(Comunicador.JOGAR_CARTA + "&" + cartaJogada.toString());
                         listaCartas.getItems().remove(listaCartas.getSelectionModel().getSelectedIndex());
-                        Rectangle stub = new Rectangle(CartaVisual.LARGURA_CARTA, CartaVisual.ALTURA_CARTA, Color.WHITE);
-                        cartaPreview.getChildren().add(stub);
+                        setPreview(null);
                     }
                 } else {
                     UnoCliente.enviarMensagemErro("Jogada inválida");
@@ -213,8 +211,7 @@ public class PartidaTela {
         vboxMao.setPadding(new Insets(10));
         vboxMao.setSpacing(30);
 
-        Rectangle stub = new Rectangle(CartaVisual.LARGURA_CARTA, CartaVisual.ALTURA_CARTA, Color.WHITE);
-        cartaPreview.getChildren().add(stub);
+        setPreview(null);
 
         VBox vboxTop = new VBox(vezJogador, contagemCorrenteLabel);
         vboxTop.setPadding(new Insets(10));
@@ -316,8 +313,7 @@ public class PartidaTela {
             maoDoJogador = Utilitarios.decodificarCartas(st);
 
             Platform.runLater(() -> {
-                CartaVisual c = new CartaVisual(cartaNaMesa.getCor(), cartaNaMesa.getNumero());
-                cartaNaMesaPane.getChildren().addAll(c, c.getNumero());
+                setCartaNaMesa(cartaNaMesa);
 
                 if (nJogador == 1) {
                     vezJogador.setText("Sua vez");
@@ -336,9 +332,7 @@ public class PartidaTela {
                 listaCartas.setItems(cartas);
                 listaCartas.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends Carta> observable, Carta oldValue, Carta newValue) -> {
                     jogar.setDisable(nJogador != vezDoJogador);
-                    CartaVisual cTemp = new CartaVisual(newValue.getCor(), newValue.getNumero());
-                    cartaPreview.getChildren().clear();
-                    cartaPreview.getChildren().addAll(cTemp, cTemp.getNumero());
+                    setPreview(newValue);
                 });
             });
 
@@ -369,14 +363,23 @@ public class PartidaTela {
         });
     }
 
+    private void setPreview(Carta c) {
+        Platform.runLater(() -> {
+            cartaPreview.getChildren().clear();
+
+            if (c == null) {
+                cartaPreview.getChildren().addAll(CartaVisual.gerarCartaVisual(-1, 0));
+            } else {
+                cartaPreview.getChildren().addAll(CartaVisual.gerarCartaVisual(c.getCor(), c.getNumero()));
+            }
+        });
+    }
+
     private void setCartaNaMesa(Carta c) {
         cartaNaMesa = c;
-
-        CartaVisual cTemp = new CartaVisual(cartaNaMesa.getCor(), cartaNaMesa.getNumero());
-
         Platform.runLater(() -> {
             cartaNaMesaPane.getChildren().clear();
-            cartaNaMesaPane.getChildren().addAll(cTemp, cTemp.getNumero());
+            cartaNaMesaPane.getChildren().addAll(CartaVisual.gerarCartaVisual(c.getCor(), c.getNumero()));
         });
     }
 
