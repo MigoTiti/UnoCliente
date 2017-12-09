@@ -6,7 +6,6 @@ import java.util.StringTokenizer;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -45,7 +44,7 @@ public class EscolhaTela {
 
         StackPane root = new StackPane(vBox);
 
-        UnoCliente.fxContainer.setScene(new Scene(root));
+        UnoCliente.setScene(root);
     }
 
     private void entrarEmPartida() {

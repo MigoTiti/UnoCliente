@@ -9,7 +9,6 @@ import java.util.StringTokenizer;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.BorderPane;
@@ -44,7 +43,7 @@ public class ConectarAoServidorTela {
 
         painel.setBottom(hBoxBaixo);
 
-        UnoCliente.fxContainer.setScene(new Scene(painel));
+        UnoCliente.setScene(painel);
         
         new Thread(() -> conectarAoServidor(ip)).start();
     }

@@ -7,7 +7,6 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -117,6 +116,6 @@ public class EscolherPartidaTela {
         
         root.setBottom(hbox2);
         
-        UnoCliente.fxContainer.setScene(new Scene(root));
+        UnoCliente.setScene(root);
     }
 }

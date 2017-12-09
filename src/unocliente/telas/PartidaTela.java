@@ -9,7 +9,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -51,6 +50,7 @@ public class PartidaTela {
     private int corSelecionadaTemp = -1;
 
     private final Button jogar = new Button("Jogar");
+    private final Button comprar = new Button("Comprar");
     private final Label vezJogador = new Label();
     private final Label contagemCorrenteLabel = new Label("Contagem corrente: 0");
     private final ListView<Carta> listaCartas = new ListView<>();
@@ -84,6 +84,10 @@ public class PartidaTela {
                 Carta cartaJogada = listaCartas.getSelectionModel().getSelectedItem();
 
                 if (validarJogada(cartaJogada)) {
+                    if (jaComprou){
+                        jaComprou = false;
+                        comprar.setText("Comprar");
+                    }
                     if (cartaJogada.getCor() == Carta.COR_PRETA && cartaJogada.getNumero() == Carta.CORINGA) {
                         Dialog<Integer> dialog = new Dialog<>();
                         dialog.setTitle("Escolha a cor desejada");
@@ -187,16 +191,15 @@ public class PartidaTela {
             }
         });
 
-        Button comprarCarta = new Button("Comprar");
-        comprarCarta.setOnAction(value -> {
+        comprar.setOnAction(value -> {
             if (nJogador == vezDoJogador) {
                 if (!jaComprou) {
-                    comprarCarta.setText("Pular");
+                    comprar.setText("Pular");
                     jaComprou = true;
                     this.comunicador.enviarMensagem(Integer.toString(Comunicador.COMPRAR_CARTA));
                     euComprei = true;
                 } else {
-                    comprarCarta.setText("Comprar");
+                    comprar.setText("Comprar");
                     jaComprou = false;
                     this.comunicador.enviarMensagem(Integer.toString(Comunicador.PULAR_JOGADA));
                 }
@@ -205,7 +208,7 @@ public class PartidaTela {
             }
         });
 
-        opcoes.getChildren().addAll(jogar, comprarCarta);
+        opcoes.getChildren().addAll(jogar, comprar);
 
         VBox vboxMao = new VBox(listaCartas, cartaPreview, opcoes);
         vboxMao.setPadding(new Insets(10));
@@ -221,7 +224,7 @@ public class PartidaTela {
         root.setLeft(vboxMao);
         root.setBottom(hbox);
 
-        UnoCliente.fxContainer.setScene(new Scene(root));
+        UnoCliente.setScene(root);
 
         new Thread(() -> iniciarJogo()).start();
     }
@@ -281,7 +284,6 @@ public class PartidaTela {
 
                     break;
                 case Comunicador.REPORTAR_JOGADA:
-                    //CARTA NA MESA + SENTIDO HORÁRIO + PROXIMO JOGADOR + CORRENTE COMPRA + CONTAGEM CORRENTE
                     setCartaNaMesa(Utilitarios.decodificarCarta(st.nextToken()));
                     sentidoHorario = st.nextToken().equals("1");
                     setVezDoJogador(Integer.parseInt(st.nextToken()));

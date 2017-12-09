@@ -9,6 +9,8 @@ import javafx.embed.swing.JFXPanel;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -19,6 +21,10 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
 import javax.swing.JApplet;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -78,15 +84,15 @@ public class UnoCliente extends JApplet {
             new ConectarAoServidorTela().iniciarTela(ipCampo.getText());
         });
 
-        StackPane testeCarta = CartaVisual.gerarCartaVisual(Carta.COR_AMARELA, 3);
-        
-        VBox vBox = new VBox(ipCampo, btn, testeCarta);
+        Node testeCarta = CartaVisual.gerarCartaVisual(Carta.COR_PRETA, Carta.MAIS_QUATRO);
+
+        VBox vBox = new VBox(ipCampo, testeCarta, btn);
         vBox.setAlignment(Pos.CENTER);
         vBox.setSpacing(10);
         vBox.setPadding(new Insets(10));
 
         StackPane root = new StackPane(vBox);
-        fxContainer.setScene(new Scene(root));
+        setScene(root);
     }
 
     public static void enviarMensagemErro(String mensagem) {
@@ -107,6 +113,12 @@ public class UnoCliente extends JApplet {
             alert.setContentText(mensagem);
             alert.showAndWait();
         });
+    }
+
+    public static void setScene(Parent cena) {
+        Scene novaCena = new Scene(cena);
+        novaCena.getStylesheets().add("unocliente/estilos/estilos.css");
+        fxContainer.setScene(novaCena);
     }
 
     public static void exibirException(Exception ex) {

@@ -1,0 +1,21 @@
+#numero_centro {
+    -fx-stroke: black;
+    -fx-stroke-width: 0.5;
+    -fx-font-smoothing-type: lcd;
+}
+
+#numero_menor {
+    -fx-stroke: black;
+    -fx-stroke-width: 0.5;
+    -fx-font-smoothing-type: lcd;
+}
+
+#borda_branca {
+    -fx-stroke: black;
+    -fx-stroke-width: 1;
+}
+
+#borda_branca_cartinha {
+    -fx-stroke: black;
+    -fx-stroke-width: 0.7;
+}
