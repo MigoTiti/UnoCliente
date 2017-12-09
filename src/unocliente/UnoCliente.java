@@ -84,9 +84,7 @@ public class UnoCliente extends JApplet {
             new ConectarAoServidorTela().iniciarTela(ipCampo.getText());
         });
 
-        Node testeCarta = CartaVisual.gerarCartaVisual(Carta.COR_PRETA, Carta.MAIS_QUATRO);
-
-        VBox vBox = new VBox(ipCampo, testeCarta, btn);
+        VBox vBox = new VBox(ipCampo, btn);
         vBox.setAlignment(Pos.CENTER);
         vBox.setSpacing(10);
         vBox.setPadding(new Insets(10));
