@@ -36,8 +36,10 @@ public class PartidaTela {
     private boolean correnteCompra = false;
     private int correnteCompraQuantidade = 0;
     private boolean sentidoHorario = true;
+    private boolean emUno = false;
     private boolean jaComprou = false;
     private boolean euComprei = false;
+    private boolean jogoFinalizado = false;
 
     private Carta cartaNaMesa;
 
@@ -80,131 +82,135 @@ public class PartidaTela {
 
         jogar.setDisable(true);
         jogar.setOnAction(value -> {
-            if (nJogador == vezDoJogador) {
-                Carta cartaJogada = listaCartas.getSelectionModel().getSelectedItem();
+            if (!jogoFinalizado) {
+                if (nJogador == vezDoJogador) {
+                    Carta cartaJogada = listaCartas.getSelectionModel().getSelectedItem();
 
-                if (validarJogada(cartaJogada)) {
-                    if (jaComprou){
-                        jaComprou = false;
-                        comprar.setText("Comprar");
-                    }
-                    if (cartaJogada.getCor() == Carta.COR_PRETA && cartaJogada.getNumero() == Carta.CORINGA) {
-                        Dialog<Integer> dialog = new Dialog<>();
-                        dialog.setTitle("Escolha a cor desejada");
-                        dialog.setResizable(true);
+                    if (validarJogada(cartaJogada)) {
+                        if (jaComprou) {
+                            jaComprou = false;
+                            comprar.setText("Comprar");
+                        }
+                        if (cartaJogada.getCor() == Carta.COR_PRETA) {
+                            Dialog<Integer> dialog = new Dialog<>();
+                            dialog.setTitle("Escolha a cor desejada");
+                            dialog.setResizable(true);
 
-                        int tamanho = 200;
+                            int tamanho = 200;
 
-                        Color vermelhoInicial = Color.rgb(96, 0, 0);
-                        Color azulInicial = Color.rgb(0, 0, 96);
-                        Color amareloInicial = Color.rgb(215, 215, 0);
-                        Color verdeInicial = Color.rgb(0, 96, 0);
+                            Color vermelhoInicial = Color.rgb(96, 0, 0);
+                            Color azulInicial = Color.rgb(0, 0, 96);
+                            Color amareloInicial = Color.rgb(215, 215, 0);
+                            Color verdeInicial = Color.rgb(0, 96, 0);
 
-                        Color vermelhoSelecionado = Color.RED;
-                        Color azulSelecionado = Color.BLUE;
-                        Color amareloSelecionado = Color.YELLOW;
-                        Color verdeSelecionado = Color.GREEN;
+                            Color vermelhoSelecionado = Color.RED;
+                            Color azulSelecionado = Color.BLUE;
+                            Color amareloSelecionado = Color.YELLOW;
+                            Color verdeSelecionado = Color.GREEN;
 
-                        Rectangle vermelho = new Rectangle(tamanho, tamanho, vermelhoInicial);
-                        Rectangle azul = new Rectangle(tamanho, tamanho, azulInicial);
-                        Rectangle amarelo = new Rectangle(tamanho, tamanho, amareloInicial);
-                        Rectangle verde = new Rectangle(tamanho, tamanho, verdeInicial);
+                            Rectangle vermelho = new Rectangle(tamanho, tamanho, vermelhoInicial);
+                            Rectangle azul = new Rectangle(tamanho, tamanho, azulInicial);
+                            Rectangle amarelo = new Rectangle(tamanho, tamanho, amareloInicial);
+                            Rectangle verde = new Rectangle(tamanho, tamanho, verdeInicial);
 
-                        GridPane grid = new GridPane();
-                        grid.add(vermelho, 1, 1);
-                        grid.add(azul, 2, 1);
-                        grid.add(amarelo, 1, 2);
-                        grid.add(verde, 2, 2);
-                        dialog.getDialogPane().setContent(grid);
+                            GridPane grid = new GridPane();
+                            grid.add(vermelho, 1, 1);
+                            grid.add(azul, 2, 1);
+                            grid.add(amarelo, 1, 2);
+                            grid.add(verde, 2, 2);
+                            dialog.getDialogPane().setContent(grid);
 
-                        ButtonType buttonTypeOk = new ButtonType("Escolher", ButtonBar.ButtonData.OK_DONE);
-                        dialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
+                            ButtonType buttonTypeOk = new ButtonType("Escolher", ButtonBar.ButtonData.OK_DONE);
+                            dialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
 
-                        final Button okButton = (Button) dialog.getDialogPane().lookupButton(buttonTypeOk);
-                        okButton.setDisable(true);
+                            final Button okButton = (Button) dialog.getDialogPane().lookupButton(buttonTypeOk);
+                            okButton.setDisable(true);
 
-                        vermelho.setOnMouseClicked(event -> {
-                            vermelho.setFill(vermelhoSelecionado);
-                            azul.setFill(azulInicial);
-                            verde.setFill(verdeInicial);
-                            amarelo.setFill(amareloInicial);
-                            corSelecionadaTemp = Carta.COR_VERMELHA;
-                            okButton.setDisable(false);
-                        });
+                            vermelho.setOnMouseClicked(event -> {
+                                vermelho.setFill(vermelhoSelecionado);
+                                azul.setFill(azulInicial);
+                                verde.setFill(verdeInicial);
+                                amarelo.setFill(amareloInicial);
+                                corSelecionadaTemp = Carta.COR_VERMELHA;
+                                okButton.setDisable(false);
+                            });
 
-                        azul.setOnMouseClicked(event -> {
-                            azul.setFill(azulSelecionado);
-                            vermelho.setFill(vermelhoInicial);
-                            verde.setFill(verdeInicial);
-                            amarelo.setFill(amareloInicial);
-                            corSelecionadaTemp = Carta.COR_AZUL;
-                            okButton.setDisable(false);
-                        });
+                            azul.setOnMouseClicked(event -> {
+                                azul.setFill(azulSelecionado);
+                                vermelho.setFill(vermelhoInicial);
+                                verde.setFill(verdeInicial);
+                                amarelo.setFill(amareloInicial);
+                                corSelecionadaTemp = Carta.COR_AZUL;
+                                okButton.setDisable(false);
+                            });
 
-                        amarelo.setOnMouseClicked(event -> {
-                            amarelo.setFill(amareloSelecionado);
-                            vermelho.setFill(vermelhoInicial);
-                            azul.setFill(azulInicial);
-                            verde.setFill(verdeInicial);
-                            corSelecionadaTemp = Carta.COR_AMARELA;
-                            okButton.setDisable(false);
-                        });
+                            amarelo.setOnMouseClicked(event -> {
+                                amarelo.setFill(amareloSelecionado);
+                                vermelho.setFill(vermelhoInicial);
+                                azul.setFill(azulInicial);
+                                verde.setFill(verdeInicial);
+                                corSelecionadaTemp = Carta.COR_AMARELA;
+                                okButton.setDisable(false);
+                            });
 
-                        verde.setOnMouseClicked(event -> {
-                            verde.setFill(verdeSelecionado);
-                            vermelho.setFill(vermelhoInicial);
-                            azul.setFill(azulInicial);
-                            amarelo.setFill(amareloInicial);
-                            corSelecionadaTemp = Carta.COR_VERDE;
-                            okButton.setDisable(false);
-                        });
+                            verde.setOnMouseClicked(event -> {
+                                verde.setFill(verdeSelecionado);
+                                vermelho.setFill(vermelhoInicial);
+                                azul.setFill(azulInicial);
+                                amarelo.setFill(amareloInicial);
+                                corSelecionadaTemp = Carta.COR_VERDE;
+                                okButton.setDisable(false);
+                            });
 
-                        dialog.setResultConverter((ButtonType b) -> {
-                            if (b == buttonTypeOk) {
-                                return corSelecionadaTemp;
+                            dialog.setResultConverter((ButtonType b) -> {
+                                if (b == buttonTypeOk) {
+                                    return corSelecionadaTemp;
+                                }
+
+                                corSelecionadaTemp = -1;
+                                return null;
+                            });
+
+                            Optional<Integer> result = dialog.showAndWait();
+
+                            if (result.isPresent()) {
+                                Integer novaCor = result.get();
+                                cartaJogada.setCor(novaCor);
+
+                                jogarCarta(cartaJogada);
                             }
-
-                            corSelecionadaTemp = -1;
-                            return null;
-                        });
-
-                        Optional<Integer> result = dialog.showAndWait();
-
-                        if (result.isPresent()) {
-                            Integer novaCor = result.get();
-                            cartaJogada.setCor(novaCor);
-
-                            this.comunicador.enviarMensagem(Comunicador.JOGAR_CARTA + "&" + cartaJogada.toString());
-                            listaCartas.getItems().remove(listaCartas.getSelectionModel().getSelectedIndex());
-                            setPreview(null);
+                        } else {
+                            jogarCarta(cartaJogada);
                         }
                     } else {
-                        this.comunicador.enviarMensagem(Comunicador.JOGAR_CARTA + "&" + cartaJogada.toString());
-                        listaCartas.getItems().remove(listaCartas.getSelectionModel().getSelectedIndex());
-                        setPreview(null);
+                        UnoCliente.enviarMensagemErro("Jogada inválida");
                     }
                 } else {
-                    UnoCliente.enviarMensagemErro("Jogada inválida");
+                    UnoCliente.enviarMensagemErro("Espere a sua vez");
                 }
             } else {
-                UnoCliente.enviarMensagemErro("Espere a sua vez");
+                UnoCliente.enviarMensagemErro("O jogo já acabou");
             }
         });
 
         comprar.setOnAction(value -> {
-            if (nJogador == vezDoJogador) {
-                if (!jaComprou) {
-                    comprar.setText("Pular");
-                    jaComprou = true;
-                    this.comunicador.enviarMensagem(Integer.toString(Comunicador.COMPRAR_CARTA));
-                    euComprei = true;
+            if (!jogoFinalizado) {
+                if (nJogador == vezDoJogador) {
+                    if (!jaComprou) {
+                        comprar.setText("Pular");
+                        jaComprou = true;
+
+                        comprarCarta();
+                    } else {
+                        comprar.setText("Comprar");
+                        jaComprou = false;
+                        this.comunicador.enviarMensagem(Integer.toString(Comunicador.PULAR_JOGADA));
+                    }
                 } else {
-                    comprar.setText("Comprar");
-                    jaComprou = false;
-                    this.comunicador.enviarMensagem(Integer.toString(Comunicador.PULAR_JOGADA));
+                    UnoCliente.enviarMensagemErro("Espere a sua vez");
                 }
             } else {
-                UnoCliente.enviarMensagemErro("Espere a sua vez");
+                UnoCliente.enviarMensagemErro("O jogo já acabou");
             }
         });
 
@@ -227,6 +233,31 @@ public class PartidaTela {
         UnoCliente.setScene(root);
 
         new Thread(() -> iniciarJogo()).start();
+    }
+
+    private void comprarCarta() {
+        if (emUno) {
+            emUno = false;
+            this.comunicador.enviarMensagem(Integer.toString(Comunicador.JOGADOR_SAIU_UNO));
+        }
+
+        this.comunicador.enviarMensagem(Integer.toString(Comunicador.COMPRAR_CARTA));
+        euComprei = true;
+    }
+
+    private void jogarCarta(Carta cartaJogada) {
+        if (listaCartas.getItems().size() == 2 && !emUno) {
+            this.comunicador.enviarMensagem(Integer.toString(Comunicador.JOGADOR_EM_UNO));
+            emUno = true;
+        }
+
+        if (listaCartas.getItems().size() == 1 && emUno) {
+            this.comunicador.enviarMensagem(Integer.toString(Comunicador.JOGADOR_VENCEU));
+        }
+
+        this.comunicador.enviarMensagem(Comunicador.JOGAR_CARTA + "&" + cartaJogada.serializarCarta());
+        listaCartas.getItems().remove(listaCartas.getSelectionModel().getSelectedIndex());
+        setPreview(null);
     }
 
     private boolean validarJogada(Carta cartaEscolhida) {
@@ -297,6 +328,41 @@ public class PartidaTela {
                 case Comunicador.PULAR_JOGADA:
                     setVezDoJogador(Integer.parseInt(st.nextToken()));
                     break;
+                case Comunicador.JOGADOR_EM_UNO: {
+                    int jogadorEmUno = Integer.parseInt(st.nextToken());
+
+                    if (jogadorEmUno == nJogador) {
+                        UnoCliente.enviarMensagemInfo("Você está em estado de Uno!");
+                    } else {
+                        UnoCliente.enviarMensagemInfo("Jogador " + jogadorEmUno + " está em estado de Uno!");
+                    }
+
+                    break;
+                }
+                case Comunicador.JOGADOR_SAIU_UNO: {
+                    int jogadorEmUno = Integer.parseInt(st.nextToken());
+
+                    if (jogadorEmUno == nJogador) {
+                        UnoCliente.enviarMensagemInfo("Você saiu do estado de Uno!");
+                    } else {
+                        UnoCliente.enviarMensagemInfo("Jogador " + jogadorEmUno + " saiu do estado de Uno!");
+                    }
+
+                    break;
+                }
+                case Comunicador.JOGADOR_VENCEU: {
+                    int jogadorEmUno = Integer.parseInt(st.nextToken());
+
+                    if (jogadorEmUno == nJogador) {
+                        UnoCliente.enviarMensagemInfo("Você venceu!");
+                    } else {
+                        UnoCliente.enviarMensagemInfo("Jogador " + jogadorEmUno + " venceu");
+                    }
+
+                    jogoFinalizado = true;
+                    
+                    break;
+                }
             }
         }
     }
@@ -388,10 +454,10 @@ public class PartidaTela {
     private void printInformacoes() {
         System.out.println("Numero de jogadores: " + nJogadores);
         System.out.println("Voce eh o jogador numero: " + nJogador);
-        System.out.println("Carta na mesa: " + cartaNaMesa.toString());
+        System.out.println("Carta na mesa: " + cartaNaMesa.serializarCarta());
 
         maoDoJogador.stream().forEach((carta) -> {
-            System.out.println("Mao: " + carta.toString());
+            System.out.println("Mao: " + carta.serializarCarta());
         });
     }
 }

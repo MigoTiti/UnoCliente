@@ -21,9 +21,63 @@ public class Carta {
         this.numero = numero;
     }
 
+    public String serializarCarta() {
+        return cor + "," + numero;
+    }
+
     @Override
     public String toString() {
-        return cor + "," + numero;
+        switch (numero) {
+            case Carta.MAIS_QUATRO:
+                return "+4 (troca de cor)";
+            case Carta.CORINGA:
+                return "Troca de cor";
+        }
+
+        String nomeCarta = "";
+        boolean reversao = false;
+
+        switch (numero) {
+            case Carta.MAIS_DOIS:
+                nomeCarta += "+2 ";
+                break;
+            case Carta.BLOQUEAR:
+                nomeCarta += "Bloqueio ";
+                break;
+            case Carta.REVERTER:
+                nomeCarta += "Reversão ";
+                reversao = true;
+                break;
+            default:
+                nomeCarta += numero + " ";
+                break;
+        }
+
+        switch (cor) {
+            case Carta.COR_AMARELA:
+                if (reversao) {
+                    nomeCarta += "amarela";
+                } else {
+                    nomeCarta += "amarelo";
+                }
+                break;
+            case Carta.COR_VERMELHA:
+                if (reversao) {
+                    nomeCarta += "vermelha";
+                } else {
+                    nomeCarta += "vermelho";
+                }
+                break;
+            case Carta.COR_VERDE:
+                nomeCarta += "verde";
+                break;
+            case Carta.COR_AZUL:
+                nomeCarta += "azul";
+                break;
+
+        }
+
+        return nomeCarta;
     }
 
     @Override

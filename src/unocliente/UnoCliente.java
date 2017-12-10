@@ -6,10 +6,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -21,17 +19,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
 import javax.swing.JApplet;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import unocliente.estruturas.Carta;
-import unocliente.estruturas.CartaVisual;
 import unocliente.telas.ConectarAoServidorTela;
 
 public class UnoCliente extends JApplet {
@@ -80,9 +72,8 @@ public class UnoCliente extends JApplet {
         TextField ipCampo = new TextField("127.0.0.1");
 
         btn.setText("Entrar");
-        btn.setOnAction((ActionEvent event) -> {
-            new ConectarAoServidorTela().iniciarTela(ipCampo.getText());
-        });
+        btn.setOnAction(event
+                -> new ConectarAoServidorTela().iniciarTela(ipCampo.getText()));
 
         VBox vBox = new VBox(ipCampo, btn);
         vBox.setAlignment(Pos.CENTER);
