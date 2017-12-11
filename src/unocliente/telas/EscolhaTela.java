@@ -71,8 +71,8 @@ public class EscolhaTela {
 
         Label label1 = new Label("Nome: ");
         Label label2 = new Label("Número de jogadores: ");
-        TextField text1 = new TextField("Teste");
-        TextField text2 = new TextField("2");
+        TextField text1 = new TextField();
+        TextField text2 = new TextField();
 
         GridPane grid = new GridPane();
         grid.add(label1, 1, 1);

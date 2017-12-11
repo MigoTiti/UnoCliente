@@ -242,6 +242,7 @@ public class PartidaTela {
         }
 
         this.comunicador.enviarMensagem(Integer.toString(Comunicador.COMPRAR_CARTA));
+        listaCartas.getSelectionModel().clearSelection();
         euComprei = true;
     }
 
@@ -257,6 +258,7 @@ public class PartidaTela {
 
         this.comunicador.enviarMensagem(Comunicador.JOGAR_CARTA + "&" + cartaJogada.serializarCarta());
         listaCartas.getItems().remove(listaCartas.getSelectionModel().getSelectedIndex());
+        listaCartas.getSelectionModel().clearSelection();
         setPreview(null);
     }
 
@@ -413,6 +415,7 @@ public class PartidaTela {
         correnteCompraQuantidade = contagem;
 
         Platform.runLater(() -> {
+            listaCartas.getSelectionModel().clearSelection();
             contagemCorrenteLabel.setText("Contagem corrente: " + correnteCompraQuantidade);
         });
     }
@@ -428,6 +431,8 @@ public class PartidaTela {
                 vezJogador.setText("Vez do jogador " + vezDoJogador);
                 vezJogador.setTextFill(Color.RED);
             }
+            
+            listaCartas.getSelectionModel().clearSelection();
         });
     }
 
@@ -446,6 +451,7 @@ public class PartidaTela {
     private void setCartaNaMesa(Carta c) {
         cartaNaMesa = c;
         Platform.runLater(() -> {
+            listaCartas.getSelectionModel().clearSelection();
             cartaNaMesaPane.getChildren().clear();
             cartaNaMesaPane.getChildren().addAll(CartaVisual.gerarCartaVisual(c.getCor(), c.getNumero()));
         });
